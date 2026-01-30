@@ -1,0 +1,290 @@
+/* src/components/DiaryView.css */
+
+.diary-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    color: var(--text-primary);
+}
+
+.diary-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+}
+
+.diary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Two equal columns */
+    gap: 2rem;
+    flex-grow: 1;
+}
+
+.diary-column h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+/* --- FORMS & INPUTS --- */
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+select,
+textarea {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    transition: all 0.2s;
+    outline: none;
+}
+
+select:focus,
+textarea:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--shadow-color);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Radio Cards */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-card {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--bg-input);
+}
+
+.radio-card:hover {
+    border-color: var(--accent-primary);
+}
+
+.radio-card.active {
+    background-color: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+.radio-card input {
+    display: none;
+    /* Hide default radio */
+}
+
+/* --- TRACKER --- */
+.tracker-card {
+    background-color: var(--bg-sidebar);
+    /* Slightly distinct background */
+    padding: 1.5rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.mood-slider {
+    width: 100%;
+    margin: 1.5rem 0 0.5rem 0;
+    accent-color: var(--accent-primary);
+    height: 6px;
+    background: #cfd8dc;
+    border-radius: 3px;
+    outline: none;
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.score-display {
+    font-weight: bold;
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+}
+
+/* Emotion Grid */
+.emotions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.emotion-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    background-color: var(--bg-main);
+    cursor: pointer;
+    transition: all 0.2s;
+    gap: 5px;
+}
+
+.emotion-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+.emotion-btn.active {
+    background-color: var(--bg-msg-user);
+    /* Light green highlight */
+    border-color: var(--accent-primary);
+}
+
+.emo-icon {
+    font-size: 1.5rem;
+}
+
+.emo-label {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+/* --- CHECK-UP SECTION --- */
+.checkup-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.checkup-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #009688 0%, #4db6ac 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+}
+
+.checkup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 150, 136, 0.4);
+}
+
+.checkup-result-card {
+    background-color: var(--bg-msg-user);
+    /* Use the mint theme msg bg for soft look */
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid var(--accent-primary);
+    animation: fadeIn 0.5s ease;
+}
+
+.checkup-result-card h4 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #1b5e20;
+}
+
+.checkup-result-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+[data-theme='dark'] .checkup-result-card h4 {
+    color: #81c784;
+}
+
+[data-theme='dark'] .checkup-result-card p {
+    color: #e8f5e9;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* --- FOOTER --- */
+.diary-footer {
+    padding-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.save-settings-btn {
+    padding: 12px 30px;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.save-settings-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    .diary-grid {
+        grid-template-columns: 1fr;
+        /* Stack vertically on small screens */
+    }
+}

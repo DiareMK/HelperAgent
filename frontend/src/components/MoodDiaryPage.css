@@ -1,0 +1,138 @@
+.mood-diary-container {
+  width: 700px;
+  height: 90vh;
+  max-width: 95%;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mood-diary-header {
+  background-color: #28a745;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mood-diary-header h1 {
+  margin: 0;
+  font-size: 1.5em;
+}
+
+.nav-button-back {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+.nav-button-back:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.mood-entry-section {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.mood-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.mood-option {
+  font-size: 2.5rem;
+  padding: 10px;
+  border: 2px solid transparent;
+  background: #f0f0f0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mood-option:hover {
+  transform: scale(1.1);
+}
+
+.mood-option.selected {
+  border-color: #28a745;
+  background-color: #e8f5e9;
+}
+
+.notes-input {
+  width: 100%;
+  max-width: 500px;
+  height: 60px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-family: inherit;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+.save-mood-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 25px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s;
+}
+
+.save-mood-button:hover {
+  background-color: #0056b3;
+}
+
+.mood-history-section {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+
+.history-emoji {
+  font-size: 2rem;
+}
+
+.history-content p {
+  margin: 0;
+}
+
+.history-notes {
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+.history-date {
+  font-size: 0.8em;
+  color: #666;
+}

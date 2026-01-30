@@ -1,0 +1,177 @@
+/* src/components/AuthPage.css */
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  /* Ensure full width */
+  /* Soft Mint background similar to the reference sidebar */
+  background-color: #e0f2f1;
+  padding: 15px;
+  /* Reduced padding for very small screens */
+}
+
+.auth-form {
+  background: white;
+  padding: 3rem;
+  border-radius: 24px;
+  /* Deep, soft shadow for airiness */
+  box-shadow: 0 10px 40px rgba(0, 121, 107, 0.08);
+  width: 100%;
+  max-width: 600px;
+  /* Increased to 600px */
+  /* Wider for desktop as requested */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: padding 0.3s ease;
+  /* Smooth transition for resizing */
+}
+
+.auth-form h2 {
+  text-align: center;
+  /* Dark Teal for headings */
+  color: #00695c;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 1.8rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  /* Slightly larger for readability */
+  font-weight: 500;
+  color: #444;
+  margin-left: 5px;
+}
+
+.form-group input {
+  padding: 14px 18px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background-color: #f5fcfb;
+  /* Very light mint tint */
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+  /* Ensure full width */
+  box-sizing: border-box;
+  /* Include padding in width */
+}
+
+.form-group input:focus {
+  background-color: white;
+  border-color: #4db6ac;
+  /* Mint accent */
+  box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.15);
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.success-message {
+  color: #388e3c;
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  /* Pill shape */
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(38, 166, 154, 0.3);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+.switch-mode {
+  text-align: center;
+  margin-top: 10px;
+  color: #00796b;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.switch-mode:hover {
+  color: #004d40;
+  text-decoration: underline;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+/* Mobile Devices (Portrait) */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+    align-items: center;
+    /* Center vertically on mobile too, or keep nice spacing */
+  }
+
+  .auth-form {
+    padding: 2rem 1.5rem;
+    /* Reduce padding to save space */
+    border-radius: 16px;
+    /* Slightly smaller radius */
+    box-shadow: 0 4px 15px rgba(0, 121, 107, 0.1);
+    /* Lighter shadow on mobile */
+  }
+
+  .auth-form h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group input {
+    padding: 12px 14px;
+    /* Smaller touch targets if needed, but 12px+ is good */
+  }
+
+  .submit-button {
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+/* Tablets (Portrait) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .auth-form {
+    padding: 2.5rem;
+    max-width: 80%;
+    /* Takes up more relative width on tablets */
+  }
+}

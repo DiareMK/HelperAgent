@@ -1,0 +1,92 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* LIGHT THEME (Default) */
+  --bg-app: #e0f2f1;
+  /* Global Mint Background */
+  --bg-sidebar: #e0f2f1;
+  /* Sidebar matches global */
+  --bg-main: #ffffff;
+  /* White cards/chat area */
+  --bg-input: #ffffff;
+  --bg-msg-bot: #d1ecf1;
+  /* Soft Blue */
+  --bg-msg-user: #dcedc8;
+  /* Soft Green */
+
+  --text-primary: #263238;
+  /* Dark Blue-Grey */
+  --text-secondary: #546e7a;
+
+  --accent-primary: #009688;
+  /* Saturated Mint */
+  --accent-hover: #00796b;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-color: rgba(0, 121, 107, 0.08);
+
+  --font-main: 'Quicksand', sans-serif;
+}
+
+[data-theme='dark'] {
+  /* DARK THEME */
+  --bg-app: #263238;
+  /* Dark Blue-Grey Background */
+  --bg-sidebar: #263238;
+  --bg-main: #37474f;
+  /* Slightly Lighter Dark for content */
+  --bg-input: #455a64;
+  --bg-msg-bot: #455a64;
+  /* Muted Dark Blue */
+  --bg-msg-user: #33691e;
+  /* Muted Dark Green */
+
+  --text-primary: #eceff1;
+  /* Soft White */
+  --text-secondary: #b0bec5;
+
+  --accent-primary: #80cbc4;
+  /* Light Mint for dark mode */
+  --accent-hover: #4db6ac;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure app container takes full variables */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-app);
+  transition: background-color 0.3s ease;
+}
+
+/* Improve scrollbars globally */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
