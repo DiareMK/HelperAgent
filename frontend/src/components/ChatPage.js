@@ -1,9 +1,10 @@
 // src/components/ChatPage.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './ChatPage.css';
 import DiaryView from './DiaryView';
 import SettingsView from './SettingsView';
+import VoiceCallModal from './VoiceCallModal';
 import { API_BASE_URL } from '../apiConfig';
 
 // Icons
@@ -15,6 +16,7 @@ const PlusIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="non
 const MoonIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
 const SunIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>;
 const TrashIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
+const HeadphonesIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>;
 
 function ChatPage({ token, onLogout }) {
   // Navigation State - Persisted
@@ -34,6 +36,25 @@ function ChatPage({ token, onLogout }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
 
+  // Voice Mode State
+  const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState('listening'); // 'listening', 'processing', 'speaking'
+  const [liveTranscript, setLiveTranscript] = useState('');
+  const recognitionRef = useRef(null);
+
+  // Available Voices
+  const [availableVoices, setAvailableVoices] = useState([]);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      setAvailableVoices(voices);
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }, []);
+
   // Settings State
   const [fontSize, setFontSizeState] = useState(() => {
     return parseInt(localStorage.getItem('appFontSize') || '16', 10);
@@ -44,12 +65,10 @@ function ChatPage({ token, onLogout }) {
     localStorage.setItem('appFontSize', size);
   };
 
-  // Apply Font Size Effect
   useEffect(() => {
     document.documentElement.style.setProperty('--base-font-size', `${fontSize}px`);
   }, [fontSize]);
 
-  // --- DIARY / SETTINGS STATE ---
   const [diarySettings, setDiarySettings] = useState(() => {
     const saved = localStorage.getItem('diarySettings');
     if (saved) {
@@ -68,7 +87,6 @@ function ChatPage({ token, onLogout }) {
     }
   });
 
-  // Check last diary entry on mount
   useEffect(() => {
     const today = new Date().toDateString();
     const lastSaved = localStorage.getItem('lastDiaryDate');
@@ -89,15 +107,11 @@ function ChatPage({ token, onLogout }) {
     setShowReminder(false);
   };
 
-  // Clear all data handler (Active Function)
   const handleClearHistory = async () => {
     try {
-      // Clear Frontend State
       setMessages([{ text: "Історія очищена.", sender: "bot" }]);
       setCurrentSessionId(null);
 
-      // Delete all sessions from Backend
-      // Using loop since we have the IDs in 'sessions' state
       const deletePromises = sessions.map(session =>
         fetch(`${API_BASE_URL}/api/sessions/${session.id}`, {
           method: 'DELETE',
@@ -108,13 +122,6 @@ function ChatPage({ token, onLogout }) {
       await Promise.all(deletePromises);
       setSessions([]);
 
-      // Also clear localStorage related to chat UI if any (none critical currently)
-      // Note: We keep Diary Settings as that's separate "Data" usually, 
-      // but if user wants FULL clear... user said "Clear Chat History". So we keep Diary.
-
-      // Show Toast or Alert? User said "Show window... If Yes...". 
-      // We already handled confirmation in SettingsView.
-      // Here we just execute.
       alert('Історію чатів успішно видалено.');
 
     } catch (error) {
@@ -126,7 +133,6 @@ function ChatPage({ token, onLogout }) {
 
   const chatEndRef = useRef(null);
 
-  // --- THEME ---
   useEffect(() => {
     const savedTheme = localStorage.getItem('appTheme') || 'light';
     setIsDarkMode(savedTheme === 'dark');
@@ -140,7 +146,6 @@ function ChatPage({ token, onLogout }) {
     localStorage.setItem('appTheme', newTheme);
   };
 
-  // --- SESSIONS ---
   const fetchSessions = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/sessions`, {
@@ -223,29 +228,161 @@ function ChatPage({ token, onLogout }) {
   };
   useEffect(scrollToBottom, [messages, activeTab]);
 
-  const handleSendMessage = async () => {
-    if (inputValue.trim() === '' || isLoading) return;
-    const userMessage = { text: inputValue, sender: "user" };
+  /* --- VOICE LOGIC START --- */
+
+  const speakResponse = useCallback((text) => {
+    if (!text) return;
+    setVoiceStatus('speaking');
+    setLiveTranscript(text);
+
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (e) { }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // --- VOICE SELECTION LOGIC ---
+    // 1. Get latest voices (in case state isn't updated yet, check window)
+    const voices = window.speechSynthesis.getVoices().length > 0
+      ? window.speechSynthesis.getVoices()
+      : availableVoices;
+
+    // 2. Find Ukrainian voice with priority: Google > Microsoft > Any uk-UA > Name contains Ukraine
+    let selectedVoice = voices.find(v =>
+      v.lang === 'uk-UA' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+    );
+
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.lang === 'uk-UA');
+    }
+
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.name.toLowerCase().includes('ukrain'));
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+      console.log("Selected Voice:", selectedVoice.name);
+    } else {
+      console.warn("No Ukrainian voice found, using default.");
+    }
+
+    utterance.lang = 'uk-UA';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => {
+      if (isVoiceOpen) {
+        setVoiceStatus('listening');
+        setLiveTranscript('');
+        try { recognitionRef.current?.start(); } catch (e) { }
+      }
+    };
+
+    utterance.onerror = (e) => {
+      console.error("Speech Synthesis Error", e);
+      if (isVoiceOpen) {
+        setVoiceStatus('listening');
+        try { recognitionRef.current?.start(); } catch (e) { }
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, [availableVoices, isVoiceOpen]); // Depend on availableVoices
+
+  // Handle Message Sending
+  const handleSendMessage = async (textOverride = null) => {
+    const textToSend = textOverride !== null ? textOverride : inputValue;
+
+    if (!textToSend || (textToSend.trim() === '' && textOverride === null) || isLoading) return;
+
+    if (textOverride === null) setInputValue('');
+
+    const userMessage = { text: textToSend, sender: "user" };
     setMessages(prev => [...prev, userMessage]);
 
-    const currentInput = inputValue;
-    setInputValue('');
     setIsLoading(true);
 
-    const contextPrompt = `
-Ти — психологічний асистент.
-Поточний стан користувача: Настрій ${diarySettings.moodScore}/10. ${diarySettings.selectedEmotion ? `Емоція: ${diarySettings.selectedEmotion}.` : ''} ${diarySettings.checkupResult ? `Результат чек-апу: ${diarySettings.checkupResult}` : ''}
-Вимоги до стилю: Будь як ${diarySettings.communicationStyle} (Стиль). Відповідь має бути ${diarySettings.responseDepth === 'short' ? 'короткою і по суті' : 'детальною і розгорнутою'}.
-Фокус розмови: ${diarySettings.focusGoal}.
-Контекст про користувача: ${diarySettings.context}.
-Додаткові побажання: ${diarySettings.notes}.
+    // --- PROMPT ENGINEERING (HIGH-LEVEL) ---
+    // 1. STYLE DEFINITION
+    let styleInstruction = "";
+    const style = diarySettings.communicationStyle;
+    const isCoach = style === 'coach' || style === 'Коуч';
 
-Враховуй цей контекст, відповідаючи на повідомлення: ${currentInput}
+    if (style === 'listener' || style === 'Слухач' || style === 'Емпат') {
+      styleInstruction = `
+        РОЛЬ: Ти — мудрий друг. 
+        ІНСТРУКЦІЯ: Слухай глибше, ніж написано. Відловлюй підтекст. Твоя сила — у вчасному мовчанні та глибоких, не банальних запитаннях.
+        ТОН: Теплий, спокійний, довірливий.`;
+    } else if (isCoach) {
+      styleInstruction = `
+        РОЛЬ: Ти — професійний ментор високого рівня. Твоя мета — результат.
+        МЕТОД: Сократичний діалог. Задавай глибокі, влучні питання, які змушують користувача знайти відповідь самостійно.
+
+        ПРИНЦИП "ХАМЕЛЕОН" (АДАПТАЦІЯ ЛЕКСИКИ):
+        Проаналізуй контекст користувача і підлаштуй словник:
+        - IT/Code: "дебаг", "фіча", "спринт", "MVP".
+        - Спорт/Військова справа: "тактика", "дистанція", "дисципліна", "перегрупування", "бойова готовність".
+        - Творчість/Мистецтво: "натхнення", "потік", "чернетку", "бачення".
+        - Незрозуміло/Абстрактно: "стратегія", "крок", "фокус", "фундамент".
+
+        ТОН: Прагматичний, без жалю, вірить у силу користувача. Питання: "Який наступний крок?", "Що змінимо зараз?".`;
+    } else if (style === 'friend' || style === 'Друг') {
+      styleInstruction = `
+        РОЛЬ: Твій давній кореш.
+        ІНСТРУКЦІЯ: Спілкуйся максимально просто, на 'ти', з гумором. Уникай офіціозу.
+        ТОН: Живий, легкий, можливо трохи іронічний.`;
+    } else {
+      styleInstruction = "РОЛЬ: Компетентний та уважний асистент.";
+    }
+
+    // 2. MOOD & ENERGY ADAPTATION
+    const moodScore = diarySettings.moodScore || 5;
+    let energyInstruction = "";
+    if (moodScore <= 4) {
+      energyInstruction = "Користувач має низький ресурс. Будь м'якшим, не дави, пропонуй малі кроки.";
+    } else if (moodScore >= 8) {
+      energyInstruction = "Користувач на підйомі! Будь енергійним, підтримуй драйв, челленджи його.";
+    } else {
+      energyInstruction = "Користувач у стабільному стані. Тримай рівний, робочий ритм.";
+    }
+
+    // 3. DYNAMIC CONTEXT (NO HARDCODING)
+    const userContext = diarySettings.context;
+    let contextPart = "";
+    if (userContext && userContext.trim().length > 0) {
+      contextPart = `КОНТЕКСТ КОРИСТУВАЧА: "${userContext}". Використовуй це як фундамент.`;
+    } else {
+      contextPart = "Контекст не задано. Акуратно з'ясуй, що турбує користувача.";
+    }
+
+    const contextPrompt = `
+Ти — асистент 'Спокій'. 
+ГАРМОНІЗАЦІЯ РОЛЕЙ: Твоя особистість 'Спокій' є гнучкою. Бути жорстким Tech Lead-ом у режимі 'Коуч' — це і є найкращий прояв турботи 'Спокою' в цей момент. Тобі не потрібно "виходити з образу" чи пояснювати це, розмовляй природно.
+
+СУВОРА ЗАБОРОНА МЕТА-КОМЕНТАРІВ:
+НІКОЛИ не виводь текст своїх внутрішніх роздумів, пояснень зміни тону або конфліктів інструкцій (наприклад, "(М'який тон...)"). 
+Виводь ТІЛЬКИ фінальну відповідь користувачеві.
+
+ТВІЙ ПОТОЧНИЙ РЕЖИМ: ${style}
+${styleInstruction}
+
+${contextPart}
+Настрій: ${moodScore}/10. 
+${energyInstruction}
+Нотатки: ${diarySettings.notes}.
+
+ПРАВИЛО "ХАМЕЛЕОН":
+- Якщо користувач пише про КОД/IT -> Використовуй метафори розробки.
+- Якщо користувач пише про ЕМОЦІЇ -> Будь теплим.
+
+ПОВІДОМЛЕННЯ КОРИСТУВАЧА:
+"${textToSend}"
     `.trim();
 
     try {
       const payload = {
-        message: currentInput,
+        message: textToSend,
         session_id: currentSessionId,
         context_prompt: contextPrompt
       };
@@ -276,14 +413,88 @@ function ChatPage({ token, onLogout }) {
       const botMessage = { text: data.reply, sender: "bot" };
       setMessages(prev => [...prev, botMessage]);
 
+      if (isVoiceOpen) {
+        speakResponse(data.reply);
+      }
+
     } catch (error) {
       console.error("Помилка:", error);
       const errorMessage = { text: "Вибачте, сталася помилка.", sender: "bot" };
       setMessages(prev => [...prev, errorMessage]);
+
+      if (isVoiceOpen) {
+        speakResponse("Вибачте, сталася помилка з'єднання.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Setup Recognition
+  useEffect(() => {
+    if (!isVoiceOpen) {
+      window.speechSynthesis.cancel();
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setLiveTranscript('');
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("На жаль, ваш браузер не підтримує розпізнавання голосу.");
+      setIsVoiceOpen(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'uk-UA';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      setVoiceStatus('listening');
+      setLiveTranscript('');
+    };
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (interimTranscript) {
+        setLiveTranscript(interimTranscript);
+      }
+
+      if (finalTranscript) {
+        setLiveTranscript(finalTranscript);
+        setVoiceStatus('processing');
+        recognition.stop();
+        handleSendMessage(finalTranscript);
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech Error", event.error);
+    };
+
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch (e) { console.error(e); }
+
+    return () => {
+      recognition.stop();
+    };
+  }, [isVoiceOpen]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') handleSendMessage();
@@ -301,6 +512,14 @@ function ChatPage({ token, onLogout }) {
             </svg>
           </div>
           <h1>СПОКІЙ</h1>
+
+          <button
+            className="voice-call-trigger"
+            onClick={() => setIsVoiceOpen(true)}
+            title="Голосовий режим"
+          >
+            <HeadphonesIcon />
+          </button>
         </div>
 
         <nav className="nav-menu">
@@ -351,6 +570,14 @@ function ChatPage({ token, onLogout }) {
           </div>
         )}
 
+        {/* VOICE MODAL OVERLAY */}
+        <VoiceCallModal
+          isOpen={isVoiceOpen}
+          onClose={() => setIsVoiceOpen(false)}
+          status={voiceStatus}
+          transcript={liveTranscript}
+        />
+
         {activeTab === 'chat' ? (
           <>
             {/* Banner inside chat */}
@@ -395,7 +622,7 @@ function ChatPage({ token, onLogout }) {
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
                   />
-                  <button className="send-btn" onClick={handleSendMessage} disabled={isLoading}>
+                  <button className="send-btn" onClick={() => handleSendMessage()} disabled={isLoading}>
                     <SendIcon />
                   </button>
                 </div>
@@ -444,9 +671,6 @@ function ChatPage({ token, onLogout }) {
                 </button>
               </div>
             ))}
-            {sessions.length === 0 && (
-              <p className="no-sessions">Тут буде історія ваших розмов</p>
-            )}
           </div>
         </aside>
       )}

@@ -34,6 +34,15 @@
     /* Colors animated by Framer Motion */
 }
 
+.text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 80px;
+    /* Reserve space */
+}
+
 .voice-status-text {
     font-size: 1.1rem;
     font-weight: 500;
@@ -42,7 +51,17 @@
     text-transform: uppercase;
 }
 
-[data-theme='light'] .voice-status-text {
+.voice-transcript {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-align: center;
+    max-width: 80vw;
+    font-style: italic;
+    font-weight: 300;
+}
+
+[data-theme='light'] .voice-status-text,
+[data-theme='light'] .voice-transcript {
     color: var(--text-primary);
 }
 

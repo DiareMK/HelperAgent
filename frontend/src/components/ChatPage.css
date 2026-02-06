@@ -40,10 +40,13 @@
 /* --- LOGO --- */
 .logo-area {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  /* Changed to row for button alignment */
   align-items: center;
+  gap: 10px;
   margin-bottom: 2rem;
   color: var(--text-primary);
+  width: 100%;
 }
 
 .logo-icon {
@@ -55,9 +58,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
+  /* Reset margin for row layout */
   box-shadow: 0 4px 10px var(--shadow-color);
   color: var(--accent-primary);
+  flex-shrink: 0;
 }
 
 .logo-area h1 {
@@ -66,6 +71,31 @@
   letter-spacing: 2px;
   margin: 0;
   text-transform: uppercase;
+}
+
+/* VOICE CALL BUTTON */
+.voice-call-trigger {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  color: var(--accent-primary);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  /* Push to right */
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  flex-shrink: 0;
+}
+
+.voice-call-trigger:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: scale(1.05);
 }
 
 /* --- NAVIGATION --- */
@@ -559,6 +589,14 @@
 
   .logo-area {
     margin-bottom: 1rem;
+    flex-direction: column;
+    /* Stack logo and button in mobile? */
+    justify-content: center;
+  }
+
+  .voice-call-trigger {
+    margin-left: 0;
+    /* Center it */
   }
 
   .chat-area {
