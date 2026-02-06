@@ -1,13 +1,15 @@
 // src/components/ChatPage.js
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import './ChatPage.css';
 import DiaryView from './DiaryView';
+import SettingsView from './SettingsView';
 import { API_BASE_URL } from '../apiConfig';
 
 // Icons
 const ChatIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
 const BookIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>;
-const UserIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
+const SettingsIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
 const SendIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
 const PlusIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
 const MoonIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
@@ -15,8 +17,14 @@ const SunIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none
 const TrashIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>;
 
 function ChatPage({ token, onLogout }) {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'diary' | 'tools'
+  // Navigation State - Persisted
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('activeTab') || 'chat';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
 
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -24,6 +32,97 @@ function ChatPage({ token, onLogout }) {
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+
+  // Settings State
+  const [fontSize, setFontSizeState] = useState(() => {
+    return parseInt(localStorage.getItem('appFontSize') || '16', 10);
+  });
+
+  const setFontSize = (size) => {
+    setFontSizeState(size);
+    localStorage.setItem('appFontSize', size);
+  };
+
+  // Apply Font Size Effect
+  useEffect(() => {
+    document.documentElement.style.setProperty('--base-font-size', `${fontSize}px`);
+  }, [fontSize]);
+
+  // --- DIARY / SETTINGS STATE ---
+  const [diarySettings, setDiarySettings] = useState(() => {
+    const saved = localStorage.getItem('diarySettings');
+    if (saved) {
+      return JSON.parse(saved);
+    } else {
+      return {
+        communicationStyle: 'listener',
+        responseDepth: 'short',
+        focusGoal: 'anxiety',
+        context: '',
+        notes: '',
+        moodScore: 5,
+        selectedEmotion: null,
+        checkupResult: ''
+      };
+    }
+  });
+
+  // Check last diary entry on mount
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const lastSaved = localStorage.getItem('lastDiaryDate');
+    if (lastSaved !== today) {
+      setShowReminder(true);
+    }
+  }, []);
+
+  const handleUpdateSettings = (newSettingsOrUpdater) => {
+    setDiarySettings(prev => {
+      const newSettings = typeof newSettingsOrUpdater === 'function'
+        ? newSettingsOrUpdater(prev)
+        : newSettingsOrUpdater;
+
+      localStorage.setItem('diarySettings', JSON.stringify(newSettings));
+      return newSettings;
+    });
+    setShowReminder(false);
+  };
+
+  // Clear all data handler (Active Function)
+  const handleClearHistory = async () => {
+    try {
+      // Clear Frontend State
+      setMessages([{ text: "Історія очищена.", sender: "bot" }]);
+      setCurrentSessionId(null);
+
+      // Delete all sessions from Backend
+      // Using loop since we have the IDs in 'sessions' state
+      const deletePromises = sessions.map(session =>
+        fetch(`${API_BASE_URL}/api/sessions/${session.id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      );
+
+      await Promise.all(deletePromises);
+      setSessions([]);
+
+      // Also clear localStorage related to chat UI if any (none critical currently)
+      // Note: We keep Diary Settings as that's separate "Data" usually, 
+      // but if user wants FULL clear... user said "Clear Chat History". So we keep Diary.
+
+      // Show Toast or Alert? User said "Show window... If Yes...". 
+      // We already handled confirmation in SettingsView.
+      // Here we just execute.
+      alert('Історію чатів успішно видалено.');
+
+    } catch (error) {
+      console.error("Failed to clear history", error);
+      alert("Сталася помилка при видаленні історії.");
+    }
+  };
+
 
   const chatEndRef = useRef(null);
 
@@ -57,14 +156,13 @@ function ChatPage({ token, onLogout }) {
   };
 
   useEffect(() => {
-    // Only refresh sessions if in chat mode or generally on mount
     fetchSessions();
   }, [token]);
 
   const loadSession = async (sessionId) => {
     setIsLoading(true);
     setCurrentSessionId(sessionId);
-    setActiveTab('chat'); // Switch to chat when clicking a session
+    setActiveTab('chat');
     try {
       const response = await fetch(`${API_BASE_URL}/api/sessions/${sessionId}/messages`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -84,7 +182,6 @@ function ChatPage({ token, onLogout }) {
     }
   };
 
-  // --- DELETE SESSION ---
   const handleDeleteSession = async (e, sessionId) => {
     e.stopPropagation();
     if (!window.confirm("Ви впевнені, що хочете видалити цей чат?")) return;
@@ -135,10 +232,22 @@ function ChatPage({ token, onLogout }) {
     setInputValue('');
     setIsLoading(true);
 
+    const contextPrompt = `
+Ти — психологічний асистент.
+Поточний стан користувача: Настрій ${diarySettings.moodScore}/10. ${diarySettings.selectedEmotion ? `Емоція: ${diarySettings.selectedEmotion}.` : ''} ${diarySettings.checkupResult ? `Результат чек-апу: ${diarySettings.checkupResult}` : ''}
+Вимоги до стилю: Будь як ${diarySettings.communicationStyle} (Стиль). Відповідь має бути ${diarySettings.responseDepth === 'short' ? 'короткою і по суті' : 'детальною і розгорнутою'}.
+Фокус розмови: ${diarySettings.focusGoal}.
+Контекст про користувача: ${diarySettings.context}.
+Додаткові побажання: ${diarySettings.notes}.
+
+Враховуй цей контекст, відповідаючи на повідомлення: ${currentInput}
+    `.trim();
+
     try {
       const payload = {
         message: currentInput,
-        session_id: currentSessionId
+        session_id: currentSessionId,
+        context_prompt: contextPrompt
       };
 
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
@@ -209,8 +318,11 @@ function ChatPage({ token, onLogout }) {
             <BookIcon /> <span>Щоденник</span>
           </button>
 
-          <button className="nav-item">
-            <UserIcon /> <span>Інструменти</span>
+          <button
+            className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            <SettingsIcon /> <span>Налаштування</span>
           </button>
 
           <div className="divider"></div>
@@ -232,8 +344,16 @@ function ChatPage({ token, onLogout }) {
 
       {/* MAIN CONTENT */}
       <main className="main-content">
+        {showReminder && activeTab !== 'diary' && (
+          <div className="reminder-banner">
+            <span>📅 Не забудьте заповнити щоденник сьогодні! Це допоможе краще вас розуміти.</span>
+            <button onClick={() => setActiveTab('diary')}>Заповнити</button>
+          </div>
+        )}
+
         {activeTab === 'chat' ? (
           <>
+            {/* Banner inside chat */}
             <div className="privacy-banner">
               Чат повністю анонімний. Ваші дані конфіденційні
             </div>
@@ -244,14 +364,22 @@ function ChatPage({ token, onLogout }) {
                   <div key={index} className={`message-row ${msg.sender === 'bot' ? 'message-bot' : 'message-user'}`}>
                     {msg.sender === 'bot' && <div className="message-avatar bot-avatar"></div>}
                     <div className="message-bubble">
-                      {msg.text}
+                      {msg.sender === 'bot' ? (
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                      ) : (
+                        msg.text
+                      )}
                     </div>
                   </div>
                 ))}
                 {isLoading && (
                   <div className="message-row message-bot">
                     <div className="message-avatar bot-avatar"></div>
-                    <div className="message-bubble typing">...</div>
+                    <div className="message-bubble typing">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
                   </div>
                 )}
                 <div ref={chatEndRef} />
@@ -275,12 +403,16 @@ function ChatPage({ token, onLogout }) {
             </div>
           </>
         ) : activeTab === 'diary' ? (
-          <DiaryView />
-        ) : (
-          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <h2>Розділ в розробці...</h2>
-          </div>
-        )}
+          <DiaryView settings={diarySettings} onUpdateSettings={handleUpdateSettings} />
+        ) : activeTab === 'settings' ? (
+          <SettingsView
+            isDarkMode={isDarkMode}
+            toggleTheme={toggleTheme}
+            fontSize={fontSize}
+            onChangeFontSize={setFontSize}
+            onClearHistory={handleClearHistory}
+          />
+        ) : null}
       </main>
 
       {/* RIGHT SIDEBAR (HISTORY) - Only show in Chat mode */}

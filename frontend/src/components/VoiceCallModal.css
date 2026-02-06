@@ -1,0 +1,78 @@
+/* src/components/VoiceCallModal.css */
+.voice-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(20, 20, 20, 0.6);
+    /* Semi-transparent dark bg */
+    backdrop-filter: blur(20px);
+    /* Heavy blur as requested */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+[data-theme='light'] .voice-modal-overlay {
+    background: rgba(240, 240, 240, 0.7);
+}
+
+.voice-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.voice-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    /* Colors animated by Framer Motion */
+}
+
+.voice-status-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+[data-theme='light'] .voice-status-text {
+    color: var(--text-primary);
+}
+
+.voice-controls {
+    position: absolute;
+    bottom: 50px;
+}
+
+.hangup-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #ff3b30;
+    /* Call Red */
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.hangup-btn:hover {
+    transform: scale(1.1);
+    background-color: #d32f2f;
+}
+
+.hangup-btn svg {
+    width: 32px;
+    height: 32px;
+}

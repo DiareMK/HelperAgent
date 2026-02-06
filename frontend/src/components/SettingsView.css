@@ -1,0 +1,226 @@
+/* src/components/SettingsView.css */
+
+.settings-container {
+    height: 100%;
+    padding: 2rem 3rem;
+    /* Increased horizontal padding */
+    box-sizing: border-box;
+    overflow-y: auto;
+    color: var(--text-primary);
+    max-width: 1200px;
+    /* Constrain width on large screens */
+    margin: 0 auto;
+}
+
+.settings-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Base Card Style */
+.settings-card {
+    background-color: var(--bg-sidebar);
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s;
+}
+
+.settings-card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+}
+
+.settings-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* --- Appearance --- */
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.theme-toggle-btn {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.font-size-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.font-label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.size-preview {
+    font-weight: bold;
+    color: var(--accent-primary);
+}
+
+.font-slider {
+    width: 100%;
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+    height: 6px;
+    background: #cfd8dc;
+    border-radius: 3px;
+    outline: none;
+}
+
+/* --- Data & Privacy --- */
+.action-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 5px;
+    transition: opacity 0.2s;
+}
+
+.export-btn {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.delete-btn {
+    background-color: rgba(239, 83, 80, 0.1);
+    /* Light red */
+    color: #ef5350;
+    border: 1px solid #ef5350;
+}
+
+.delete-btn:hover {
+    background-color: #ef5350;
+    color: white;
+}
+
+/* --- Emergency Card (Red) --- */
+.emergency-card {
+    border: 2px solid #e53935 !important;
+    background-color: rgba(229, 57, 53, 0.05);
+    /* Very faint red tint */
+}
+
+/* Increase contrast for dark mode */
+[data-theme='dark'] .emergency-card {
+    background-color: rgba(60, 20, 20, 0.6);
+}
+
+.emergency-card h3 {
+    color: #e53935;
+}
+
+.warning-text {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.hotline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hotline-list li {
+    background-color: var(--bg-main);
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+}
+
+.hotline-list a {
+    color: var(--accent-primary);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.hotline-list a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 1rem;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.settings-footer-disclaimer {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    width: 100%;
+}

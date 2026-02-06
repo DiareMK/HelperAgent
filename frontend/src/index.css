@@ -27,6 +27,8 @@
   --shadow-color: rgba(0, 121, 107, 0.08);
 
   --font-main: 'Quicksand', sans-serif;
+  --base-font-size: 16px;
+  /* Dynamic Font Size Default */
 }
 
 [data-theme='dark'] {
@@ -54,12 +56,19 @@
   --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
+/* CRITICAL: Apply base font size to HTML root so rem units scale */
+html {
+  font-size: var(--base-font-size);
+  transition: font-size 0.2s ease;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--bg-app);
   color: var(--text-primary);
   margin: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Font size inherited from html */
 }
 
 /* Ensure app container takes full variables */

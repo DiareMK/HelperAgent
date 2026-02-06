@@ -228,6 +228,7 @@ def handle_chat():
     data = request.get_json()
     user_message_content = data.get("message")
     session_id = data.get("session_id") # Отримуємо ID сесії
+    context_prompt = data.get("context_prompt") # --- NEW: context from frontend ---
 
     if not user_message_content:
         return jsonify({"error": "Повідомлення не може бути порожнім"}), 400
@@ -270,10 +271,17 @@ def handle_chat():
         
         chat_session_gemini = model.start_chat(history=history)
         
-        response = chat_session_gemini.send_message(user_message_content)
+        # --- CONTEXT INJECTION LOGIC ---
+        full_message_to_send = user_message_content
+        if context_prompt:
+             # Ін'єктуємо контекст, але відокремлюємо його, щоб модель розуміла контекст
+             full_message_to_send = f"{context_prompt}\n\n---\nПовідомлення користувача:\n{user_message_content}"
+        # -------------------------------
+
+        response = chat_session_gemini.send_message(full_message_to_send)
         bot_response_content = response.text
 
-        # Зберігаємо в БД з прив'язкою до session_id
+        # Зберігаємо в БД з прив'язкою до session_id (Тільки оригінальне повідомлення!)
         user_message_db = Message(content=user_message_content, sender='user', session_id=session_id)
         bot_message_db = Message(content=bot_response_content, sender='bot', session_id=session_id)
         db.session.add(user_message_db)
