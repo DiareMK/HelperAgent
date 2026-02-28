@@ -7,6 +7,7 @@ function AuthPage({ onLoginSuccess }) {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false); // НОВЕ: стан для чекбоксу
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -14,6 +15,12 @@ function AuthPage({ onLoginSuccess }) {
     e.preventDefault();
     setError('');
     setMessage('');
+
+    // Перевірка чекбоксу тільки при реєстрації
+    if (!isLoginMode && !acceptedTerms) {
+      setError('Будь ласка, ознайомтеся та погодьтеся з правилами використання системи.');
+      return;
+    }
 
     const endpoint = isLoginMode ? '/api/login' : '/api/register';
     const url = `${API_BASE_URL}${endpoint}`; // <-- ВИКОРИСТОВУЄМО КОНСТАНТУ
@@ -36,6 +43,7 @@ function AuthPage({ onLoginSuccess }) {
       } else {
         setMessage('Реєстрація успішна! Тепер ви можете увійти.');
         setIsLoginMode(true);
+        setAcceptedTerms(false); // Скидаємо чекбокс після успішної реєстрації
       }
 
     } catch (err) {
@@ -55,12 +63,34 @@ function AuthPage({ onLoginSuccess }) {
           <label htmlFor="password">Пароль</label>
           <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
+
+        {!isLoginMode && (
+          <div className="form-group terms-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+              />
+              <span className="terms-text">
+                Створюючи обліковий запис у системі «Спокій», я розумію та підтверджую наступне:<br /><br />
+                Додаток є інструментом психологічної підтримки, а не медичним засобом. AI-помічник не ставить діагнозів і не призначає лікування. У разі критичних станів я зобов'язуюсь звертатися до кваліфікованих спеціалістів або на лінію підтримки (7333).<br /><br />
+                Я надаю згоду на збір та обробку моїх персональних даних, зокрема записів настрою та текстів сесій чату, виключно для роботи алгоритмів штучного інтелекту.<br /><br />
+                Я обізнаний зі своїм правом у будь-який час відкликати цю згоду та видалити свій профіль разом із повною історією комунікації.
+              </span>
+            </label>
+          </div>
+        )}
+
         {error && <p className="error-message">{error}</p>}
         {message && <p className="success-message">{message}</p>}
         <button type="submit" className="submit-button">
           {isLoginMode ? 'Увійти' : 'Зареєструватися'}
         </button>
-        <p className="switch-mode" onClick={() => setIsLoginMode(!isLoginMode)}>
+        <p className="switch-mode" onClick={() => {
+          setIsLoginMode(!isLoginMode);
+          setError(''); // Очищаємо помилки при перемиканні
+        }}>
           {isLoginMode ? 'Немає акаунту? Зареєструватися' : 'Вже є акаунт? Увійти'}
         </p>
       </form>

@@ -111,7 +111,7 @@ SYSTEM_PROMPT = """
 try:
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
     model = genai.GenerativeModel(
-        'models/gemini-flash-latest',
+        'gemini-2.0-flash',
         system_instruction=SYSTEM_PROMPT
     )
 except Exception as e:
@@ -307,6 +307,70 @@ def delete_session(session_id):
     db.session.delete(session)
     db.session.commit()
     return jsonify({"message": "Сесію видалено"}), 200
+
+# --- МАРШРУТИ ОБЛІКОВОГО ЗАПИСУ ---
+
+@app.route('/api/account', methods=['GET'])
+@jwt_required()
+def get_account():
+    """Отримати інформацію про обліковий запис"""
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "Користувача не знайдено"}), 404
+    
+    sessions_count = ChatSession.query.filter_by(user_id=current_user_id).count()
+    mood_count = MoodEntry.query.filter_by(user_id=current_user_id).count()
+    
+    return jsonify({
+        "email": user.email,
+        "sessions_count": sessions_count,
+        "mood_entries_count": mood_count,
+        "created_at": user.id  # Using ID as a proxy since we don't have created_at
+    }), 200
+
+@app.route('/api/account/password', methods=['PUT'])
+@jwt_required()
+def change_password():
+    """Змінити пароль облікового запису"""
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "Користувача не знайдено"}), 404
+    
+    data = request.get_json()
+    current_password = data.get('current_password', '')
+    new_password = data.get('new_password', '')
+    
+    if not current_password or not new_password:
+        return jsonify({"error": "Вкажіть поточний і новий пароль"}), 400
+    
+    if len(new_password) < 4:
+        return jsonify({"error": "Новий пароль має бути не менше 4 символів"}), 400
+    
+    if not bcrypt.check_password_hash(user.password_hash, current_password):
+        return jsonify({"error": "Поточний пароль невірний"}), 403
+    
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    db.session.commit()
+    
+    return jsonify({"message": "Пароль успішно змінено"}), 200
+
+@app.route('/api/account', methods=['DELETE'])
+@jwt_required()
+def delete_account():
+    """Видалити обліковий запис та всі пов'язані дані"""
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify({"error": "Користувача не знайдено"}), 404
+    
+    # cascade="all, delete-orphan" в моделі User автоматично видалить 
+    # всі sessions, messages та mood_entries
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({"message": "Обліковий запис та всі дані видалено назавжди"}), 200
 
 # 5. Запуск сервера
 # ------------------------------------

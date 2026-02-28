@@ -1,74 +1,99 @@
 /* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* LIGHT THEME (Default) */
-  --bg-app: #e0f2f1;
-  /* Global Mint Background */
-  --bg-sidebar: #e0f2f1;
-  /* Sidebar matches global */
+  /* LIGHT THEME — Premium Teal & Ivory */
+  --bg-app: #f0f7f6;
+  --bg-sidebar: #e8f3f1;
   --bg-main: #ffffff;
-  /* White cards/chat area */
   --bg-input: #ffffff;
-  --bg-msg-bot: #d1ecf1;
-  /* Soft Blue */
-  --bg-msg-user: #dcedc8;
-  /* Soft Green */
+  --bg-msg-bot: rgba(209, 236, 241, 0.6);
+  --bg-msg-user: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
+  --bg-msg-user-solid: #a8e6cf;
+  --bg-glass: rgba(255, 255, 255, 0.65);
+  --bg-card: rgba(255, 255, 255, 0.7);
 
-  --text-primary: #263238;
-  /* Dark Blue-Grey */
-  --text-secondary: #546e7a;
+  --text-primary: #1a2e35;
+  --text-secondary: #5a7a84;
 
   --accent-primary: #009688;
-  /* Saturated Mint */
+  --accent-secondary: #26a69a;
   --accent-hover: #00796b;
+  --accent-glow: rgba(0, 150, 136, 0.25);
 
-  --border-color: rgba(0, 0, 0, 0.08);
+  --gradient-primary: linear-gradient(135deg, #009688 0%, #26a69a 50%, #4db6ac 100%);
+  --gradient-bg: linear-gradient(145deg, #e0f2f1 0%, #f0f7f6 30%, #e8f5e9 100%);
+  --gradient-sidebar: linear-gradient(180deg, #e0f2f1 0%, #d0ece9 100%);
+
+  --border-color: rgba(0, 100, 90, 0.08);
   --shadow-color: rgba(0, 121, 107, 0.08);
+  --shadow-soft: 0 4px 24px rgba(0, 80, 70, 0.06);
+  --shadow-medium: 0 8px 32px rgba(0, 80, 70, 0.1);
+  --shadow-elevated: 0 12px 48px rgba(0, 80, 70, 0.12);
 
-  --font-main: 'Quicksand', sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --font-main: 'Inter', 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Quicksand', 'Inter', sans-serif;
   --base-font-size: 16px;
-  /* Dynamic Font Size Default */
+
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme='dark'] {
-  /* DARK THEME */
-  --bg-app: #263238;
-  /* Dark Blue-Grey Background */
-  --bg-sidebar: #263238;
-  --bg-main: #37474f;
-  /* Slightly Lighter Dark for content */
-  --bg-input: #455a64;
-  --bg-msg-bot: #455a64;
-  /* Muted Dark Blue */
-  --bg-msg-user: #33691e;
-  /* Muted Dark Green */
+  /* DARK THEME — Deep Ocean */
+  --bg-app: #0f1923;
+  --bg-sidebar: #152028;
+  --bg-main: #1a2a34;
+  --bg-input: #243640;
+  --bg-msg-bot: rgba(36, 54, 64, 0.8);
+  --bg-msg-user: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  --bg-msg-user-solid: #2e7d32;
+  --bg-glass: rgba(21, 32, 40, 0.75);
+  --bg-card: rgba(26, 42, 52, 0.7);
 
-  --text-primary: #eceff1;
-  /* Soft White */
-  --text-secondary: #b0bec5;
+  --text-primary: #e8eef1;
+  --text-secondary: #8ba4b0;
 
-  --accent-primary: #80cbc4;
-  /* Light Mint for dark mode */
-  --accent-hover: #4db6ac;
+  --accent-primary: #4db6ac;
+  --accent-secondary: #80cbc4;
+  --accent-hover: #80cbc4;
+  --accent-glow: rgba(77, 182, 172, 0.2);
 
-  --border-color: rgba(255, 255, 255, 0.1);
+  --gradient-primary: linear-gradient(135deg, #4db6ac 0%, #80cbc4 100%);
+  --gradient-bg: linear-gradient(145deg, #0f1923 0%, #152028 50%, #1a2a34 100%);
+  --gradient-sidebar: linear-gradient(180deg, #152028 0%, #0f1923 100%);
+
+  --border-color: rgba(77, 182, 172, 0.12);
   --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 12px 48px rgba(0, 0, 0, 0.35);
 }
 
 /* CRITICAL: Apply base font size to HTML root so rem units scale */
 html {
   font-size: var(--base-font-size);
   transition: font-size 0.2s ease;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: var(--font-main);
-  background-color: var(--bg-app);
+  background: var(--bg-app);
   color: var(--text-primary);
   margin: 0;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  /* Font size inherited from html */
+  padding: 0;
+  min-height: 100vh;
+  transition: background 0.4s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Ensure app container takes full variables */
@@ -78,13 +103,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-app);
-  transition: background-color 0.3s ease;
+  background: var(--gradient-bg);
+  background-attachment: fixed;
+  transition: background 0.4s ease;
 }
 
-/* Improve scrollbars globally */
+/* Premium scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -92,10 +118,25 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  background-color: rgba(0, 150, 136, 0.2);
+  border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 150, 136, 0.4);
 }
 
 [data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(77, 182, 172, 0.2);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(77, 182, 172, 0.4);
+}
+
+/* Global Selection */
+::selection {
+  background-color: rgba(0, 150, 136, 0.25);
+  color: inherit;
 }

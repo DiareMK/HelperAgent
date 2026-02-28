@@ -174,11 +174,9 @@ function ChatPage({ token, onLogout }) {
       });
       if (response.ok) {
         const history = await response.json();
-        if (history.length === 0) {
-          setMessages([{ text: "Привіт! Це початок нової розмови.", sender: "bot" }]);
-        } else {
-          setMessages(history);
-        }
+        // REMOVED logic that automatically added a welcome message to previously empty sessions on load. 
+        // We just show the history as-is, or empty.
+        setMessages(history);
       }
     } catch (e) {
       console.error(e);
@@ -200,7 +198,9 @@ function ChatPage({ token, onLogout }) {
       if (response.ok) {
         setSessions(prev => prev.filter(s => s.id !== sessionId));
         if (currentSessionId === sessionId) {
-          handleNewChat();
+          // Clear current context if we deleted the active chat
+          setCurrentSessionId(null);
+          setMessages([]);
         }
       } else {
         alert("Не вдалося видалити чат");
@@ -216,12 +216,9 @@ function ChatPage({ token, onLogout }) {
     setActiveTab('chat');
   };
 
-  useEffect(() => {
-    if (currentSessionId === null && messages.length === 0 && activeTab === 'chat') {
-      setMessages([{ text: "Привіт, я твій друг 'Спокій'. Чим можу сьогодні допомогти?", sender: "bot" }]);
-    }
-  }, [currentSessionId, activeTab]);
-
+  // REMOVED the problematic useEffect that auto-inserted the welcome message infinitely 
+  // on every click or state change if currentSessionId was null.
+  // Instead, handleNewChat should be the ONLY way a fresh chat gets the welcome text explicitly.
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -241,13 +238,10 @@ function ChatPage({ token, onLogout }) {
 
     const utterance = new SpeechSynthesisUtterance(text);
 
-    // --- VOICE SELECTION LOGIC ---
-    // 1. Get latest voices (in case state isn't updated yet, check window)
     const voices = window.speechSynthesis.getVoices().length > 0
       ? window.speechSynthesis.getVoices()
       : availableVoices;
 
-    // 2. Find Ukrainian voice with priority: Google > Microsoft > Any uk-UA > Name contains Ukraine
     let selectedVoice = voices.find(v =>
       v.lang === 'uk-UA' && (v.name.includes('Google') || v.name.includes('Microsoft'))
     );
@@ -262,9 +256,6 @@ function ChatPage({ token, onLogout }) {
 
     if (selectedVoice) {
       utterance.voice = selectedVoice;
-      console.log("Selected Voice:", selectedVoice.name);
-    } else {
-      console.warn("No Ukrainian voice found, using default.");
     }
 
     utterance.lang = 'uk-UA';
@@ -272,29 +263,39 @@ function ChatPage({ token, onLogout }) {
     utterance.pitch = 1.0;
 
     utterance.onend = () => {
-      if (isVoiceOpen) {
-        setVoiceStatus('listening');
-        setLiveTranscript('');
-        try { recognitionRef.current?.start(); } catch (e) { }
-      }
+      // Only set status back to listening if the voice modal is ACTUALLY still open
+      // Use functional state update to ensure we have the latest isVoiceOpen value if needed, 
+      // but checking isVoiceOpen directly here from closure might be slightly stale if closed rapidly.
+      setIsVoiceOpen(prevIsOpen => {
+        if (prevIsOpen) {
+          setVoiceStatus('listening');
+          setLiveTranscript('');
+          try { recognitionRef.current?.start(); } catch (e) { }
+        }
+        return prevIsOpen;
+      });
     };
 
     utterance.onerror = (e) => {
       console.error("Speech Synthesis Error", e);
-      if (isVoiceOpen) {
-        setVoiceStatus('listening');
-        try { recognitionRef.current?.start(); } catch (e) { }
-      }
+      setIsVoiceOpen(prevIsOpen => {
+        if (prevIsOpen) {
+          setVoiceStatus('listening');
+          try { recognitionRef.current?.start(); } catch (e) { }
+        }
+        return prevIsOpen;
+      });
     };
 
     window.speechSynthesis.speak(utterance);
-  }, [availableVoices, isVoiceOpen]); // Depend on availableVoices
+  }, [availableVoices]); // Removed isVoiceOpen dependency to prevent stale closures re-triggering unnecessary renders
 
   // Handle Message Sending
   const handleSendMessage = async (textOverride = null) => {
     const textToSend = textOverride !== null ? textOverride : inputValue;
 
-    if (!textToSend || (textToSend.trim() === '' && textOverride === null) || isLoading) return;
+    // Prevent sending empty messages
+    if (!textToSend || textToSend.trim() === '') return;
 
     if (textOverride === null) setInputValue('');
 
@@ -303,8 +304,6 @@ function ChatPage({ token, onLogout }) {
 
     setIsLoading(true);
 
-    // --- PROMPT ENGINEERING (HIGH-LEVEL) ---
-    // 1. STYLE DEFINITION
     let styleInstruction = "";
     const style = diarySettings.communicationStyle;
     const isCoach = style === 'coach' || style === 'Коуч';
@@ -336,7 +335,6 @@ function ChatPage({ token, onLogout }) {
       styleInstruction = "РОЛЬ: Компетентний та уважний асистент.";
     }
 
-    // 2. MOOD & ENERGY ADAPTATION
     const moodScore = diarySettings.moodScore || 5;
     let energyInstruction = "";
     if (moodScore <= 4) {
@@ -347,7 +345,6 @@ function ChatPage({ token, onLogout }) {
       energyInstruction = "Користувач у стабільному стані. Тримай рівний, робочий ритм.";
     }
 
-    // 3. DYNAMIC CONTEXT (NO HARDCODING)
     const userContext = diarySettings.context;
     let contextPart = "";
     if (userContext && userContext.trim().length > 0) {
@@ -413,18 +410,18 @@ ${energyInstruction}
       const botMessage = { text: data.reply, sender: "bot" };
       setMessages(prev => [...prev, botMessage]);
 
-      if (isVoiceOpen) {
-        speakResponse(data.reply);
-      }
+      // Using functional state to safely check if voice modal is STILL open before speaking
+      setIsVoiceOpen(prevIsOpen => {
+        if (prevIsOpen) {
+          speakResponse(data.reply);
+        }
+        return prevIsOpen;
+      });
 
     } catch (error) {
       console.error("Помилка:", error);
       const errorMessage = { text: "Вибачте, сталася помилка.", sender: "bot" };
       setMessages(prev => [...prev, errorMessage]);
-
-      if (isVoiceOpen) {
-        speakResponse("Вибачте, сталася помилка з'єднання.");
-      }
     } finally {
       setIsLoading(false);
     }
@@ -435,7 +432,9 @@ ${energyInstruction}
     if (!isVoiceOpen) {
       window.speechSynthesis.cancel();
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch (e) { }
       }
       setLiveTranscript('');
       return;
@@ -477,13 +476,17 @@ ${energyInstruction}
       if (finalTranscript) {
         setLiveTranscript(finalTranscript);
         setVoiceStatus('processing');
-        recognition.stop();
+        try { recognition.stop(); } catch (e) { }
         handleSendMessage(finalTranscript);
       }
     };
 
     recognition.onerror = (event) => {
       console.error("Speech Error", event.error);
+      // Don't auto-close modal on silent errors like "no-speech", just restart listening
+      if (event.error === 'no-speech' && isVoiceOpen) {
+        try { recognition.start(); } catch (e) { }
+      }
     };
 
     recognitionRef.current = recognition;
@@ -492,7 +495,7 @@ ${energyInstruction}
     } catch (e) { console.error(e); }
 
     return () => {
-      recognition.stop();
+      try { recognition.stop(); } catch (e) { }
     };
   }, [isVoiceOpen]);
 
@@ -512,14 +515,6 @@ ${energyInstruction}
             </svg>
           </div>
           <h1>СПОКІЙ</h1>
-
-          <button
-            className="voice-call-trigger"
-            onClick={() => setIsVoiceOpen(true)}
-            title="Голосовий режим"
-          >
-            <HeadphonesIcon />
-          </button>
         </div>
 
         <nav className="nav-menu">
@@ -552,12 +547,12 @@ ${energyInstruction}
           </button>
         </nav>
 
-        <div className="user-profile">
+        <div className="user-profile" onClick={() => setActiveTab('settings')} style={{ cursor: 'pointer' }}>
           <div className="avatar-placeholder">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           </div>
           <span className="user-name">Анонімний</span>
-          <button className="mini-logout" onClick={onLogout} title="Вийти">✕</button>
+          <button className="mini-logout" onClick={(e) => { e.stopPropagation(); onLogout(); }} title="Вийти">✕</button>
         </div>
       </aside>
 
@@ -599,16 +594,22 @@ ${energyInstruction}
                     </div>
                   </div>
                 ))}
+
+                {/* 
+                  FIX: The typing indicator logic inside map was causing issues. 
+                  It's now correctly placed AFTER the messages list map, only showing when isLoading is true.
+                */}
                 {isLoading && (
                   <div className="message-row message-bot">
                     <div className="message-avatar bot-avatar"></div>
-                    <div className="message-bubble typing">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                    <div className="message-bubble">
+                      <div className="typing-indicator">
+                        <span></span><span></span><span></span>
+                      </div>
                     </div>
                   </div>
                 )}
+
                 <div ref={chatEndRef} />
               </div>
 
@@ -619,10 +620,26 @@ ${energyInstruction}
                     placeholder="Напишіть ваше повідомлення..."
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
+                    spellCheck={false}
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    data-gramm="false"
+                    data-gramm_editor="false"
+                    data-enable-grammarly="false"
+                    lang="uk"
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
                   />
-                  <button className="send-btn" onClick={() => handleSendMessage()} disabled={isLoading}>
+                  <button
+                    className="voice-call-trigger-input"
+                    onClick={() => setIsVoiceOpen(true)}
+                    title="Голосовий режим"
+                    type="button"
+                  >
+                    <HeadphonesIcon />
+                  </button>
+                  <button className="send-btn" onClick={() => handleSendMessage(null)} disabled={isLoading || !inputValue.trim()}>
                     <SendIcon />
                   </button>
                 </div>
@@ -638,6 +655,7 @@ ${energyInstruction}
             fontSize={fontSize}
             onChangeFontSize={setFontSize}
             onClearHistory={handleClearHistory}
+            onLogout={onLogout}
           />
         ) : null}
       </main>
@@ -674,6 +692,31 @@ ${energyInstruction}
           </div>
         </aside>
       )}
+
+      {/* MOBILE BOTTOM TAB BAR — hidden on desktop via CSS */}
+      <nav className="mobile-tab-bar">
+        <button
+          className={`mobile-tab ${activeTab === 'chat' ? 'active' : ''}`}
+          onClick={() => setActiveTab('chat')}
+        >
+          <ChatIcon />
+          <span>Чат</span>
+        </button>
+        <button
+          className={`mobile-tab ${activeTab === 'diary' ? 'active' : ''}`}
+          onClick={() => setActiveTab('diary')}
+        >
+          <BookIcon />
+          <span>Щоденник</span>
+        </button>
+        <button
+          className={`mobile-tab ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          <SettingsIcon />
+          <span>Налаштування</span>
+        </button>
+      </nav>
     </div>
   );
 }

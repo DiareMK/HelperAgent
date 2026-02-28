@@ -5,10 +5,9 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(20, 20, 20, 0.6);
-    /* Semi-transparent dark bg */
-    backdrop-filter: blur(20px);
-    /* Heavy blur as requested */
+    background: rgba(10, 15, 20, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,7 +16,7 @@
 }
 
 [data-theme='light'] .voice-modal-overlay {
-    background: rgba(240, 240, 240, 0.7);
+    background: rgba(230, 240, 238, 0.8);
 }
 
 .voice-content {
@@ -31,7 +30,6 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    /* Colors animated by Framer Motion */
 }
 
 .text-container {
@@ -40,15 +38,15 @@
     align-items: center;
     gap: 10px;
     height: 80px;
-    /* Reserve space */
 }
 
 .voice-status-text {
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: 1rem;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
+    font-family: var(--font-main);
 }
 
 .voice-transcript {
@@ -71,27 +69,53 @@
 }
 
 .hangup-btn {
-    width: 64px;
-    height: 64px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
-    background-color: #ff3b30;
-    /* Call Red */
+    background: linear-gradient(135deg, #ff3b30, #d32f2f);
     border: none;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
-    transition: transform 0.2s, background-color 0.2s;
+    box-shadow: 0 6px 24px rgba(255, 59, 48, 0.4);
+    transition: transform var(--transition-fast), box-shadow var(--transition-medium);
 }
 
 .hangup-btn:hover {
     transform: scale(1.1);
-    background-color: #d32f2f;
+    box-shadow: 0 8px 32px rgba(255, 59, 48, 0.5);
 }
 
 .hangup-btn svg {
     width: 32px;
     height: 32px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .voice-circle {
+        width: 140px;
+        height: 140px;
+    }
+
+    .voice-content {
+        gap: 30px;
+    }
+
+    .voice-transcript {
+        font-size: 1.1rem;
+        max-width: 90vw;
+    }
+
+    .hangup-btn {
+        width: 60px;
+        height: 60px;
+    }
+
+    .voice-controls {
+        bottom: 80px;
+        /* Above mobile tab bar */
+    }
 }

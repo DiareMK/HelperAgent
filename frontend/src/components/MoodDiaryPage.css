@@ -1,19 +1,21 @@
+/* src/components/MoodDiaryPage.css — Updated to use CSS variables for dark mode support */
+
 .mood-diary-container {
   width: 700px;
   height: 90vh;
   max-width: 95%;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-main);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .mood-diary-header {
-  background-color: #28a745;
+  background: var(--gradient-primary);
   color: white;
-  padding: 15px 20px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,33 +23,38 @@
 
 .mood-diary-header h1 {
   margin: 0;
-  font-size: 1.5em;
+  font-size: 1.4em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .nav-button-back {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
-  border: 1px solid white;
-  border-radius: 5px;
-  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  padding: 6px 14px;
   cursor: pointer;
-  font-size: 0.9em;
-  transition: background-color 0.2s;
+  font-size: 0.88em;
+  transition: all var(--transition-fast);
+  font-family: var(--font-main);
 }
+
 .nav-button-back:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .mood-entry-section {
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   text-align: center;
 }
 
 .mood-selector {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 12px;
   margin: 20px 0;
 }
 
@@ -55,47 +62,62 @@
   font-size: 2.5rem;
   padding: 10px;
   border: 2px solid transparent;
-  background: #f0f0f0;
-  border-radius: 50%;
+  background: var(--bg-input);
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-medium);
 }
 
 .mood-option:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: var(--shadow-soft);
 }
 
 .mood-option.selected {
-  border-color: #28a745;
-  background-color: #e8f5e9;
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .notes-input {
   width: 100%;
   max-width: 500px;
   height: 60px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   margin-bottom: 15px;
-  font-family: inherit;
+  font-family: var(--font-main);
   font-size: 1em;
   box-sizing: border-box;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: all var(--transition-medium);
+  outline: none;
+}
+
+.notes-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .save-mood-button {
-  background-color: #007bff;
+  background: var(--gradient-primary);
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 12px 25px;
+  border-radius: 50px;
+  padding: 12px 28px;
   cursor: pointer;
   font-size: 1em;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  font-family: var(--font-main);
+  transition: transform var(--transition-fast), box-shadow var(--transition-medium);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
 }
 
 .save-mood-button:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 150, 136, 0.4);
 }
 
 .mood-history-section {
@@ -107,16 +129,22 @@
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
 }
 
 .history-item {
   display: flex;
   align-items: flex-start;
-  gap: 15px;
-  padding: 10px;
-  background: #f9f9f9;
-  border-radius: 5px;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.history-item:hover {
+  box-shadow: var(--shadow-soft);
 }
 
 .history-emoji {
@@ -130,9 +158,10 @@
 .history-notes {
   font-size: 1em;
   margin-bottom: 5px;
+  color: var(--text-primary);
 }
 
 .history-date {
-  font-size: 0.8em;
-  color: #666;
+  font-size: 0.78em;
+  color: var(--text-secondary);
 }
