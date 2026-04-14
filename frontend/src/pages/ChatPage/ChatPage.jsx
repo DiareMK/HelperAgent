@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import './ChatPage.css';
-import DiaryView from './DiaryView';
-import SettingsView from './SettingsView';
-import VoiceCallModal from './VoiceCallModal';
-import { API_BASE_URL } from '../apiConfig';
+import DiaryView from '../../components/DiaryView/DiaryView';
+import SettingsView from '../../components/SettingsView/SettingsView';
+import VoiceCallModal from '../../components/VoiceCallModal/VoiceCallModal';
+import { API_BASE_URL } from '../../apiConfig';
 
 // Icons
 const ChatIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
@@ -396,8 +396,20 @@ ${energyInstruction}
       if (!response.ok) {
         if (response.status === 401) {
           onLogout();
+          return;
         }
-        throw new Error('Помилка мережі');
+        // Зчитуємо тіло помилки з бекенду
+        let errData = {};
+        try { errData = await response.json(); } catch (_) { }
+
+        if (response.status === 429 || errData.error_type === 'quota_exceeded') {
+          const errorMessage = { text: "⏳ Сервіс зараз перевантажений. Спробуй ще раз через 1–2 хвилини.", sender: "bot" };
+          setMessages(prev => [...prev, errorMessage]);
+          setIsLoading(false);
+          return;
+        }
+
+        throw new Error(errData.error || 'Помилка сервера');
       }
 
       const data = await response.json();
@@ -420,7 +432,7 @@ ${energyInstruction}
 
     } catch (error) {
       console.error("Помилка:", error);
-      const errorMessage = { text: "Вибачте, сталася помилка.", sender: "bot" };
+      const errorMessage = { text: `⚠️ ${error.message || 'Вибачте, сталася помилка. Спробуйте пізніше.'}`, sender: "bot" };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);

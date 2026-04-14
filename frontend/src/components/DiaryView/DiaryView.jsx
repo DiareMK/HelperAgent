@@ -1,7 +1,7 @@
 // src/components/DiaryView.js
 import React, { useState, useEffect } from 'react';
 import './DiaryView.css';
-import CheckupModal from './CheckupModal';
+import CheckupModal from '../CheckupModal/CheckupModal';
 
 const Emotions = [
     { id: 'joy', label: 'Радість', icon: '😊' },

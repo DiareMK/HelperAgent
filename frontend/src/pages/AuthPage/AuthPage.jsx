@@ -1,7 +1,7 @@
 // src/components/AuthPage.js
 import React, { useState } from 'react';
 import './AuthPage.css';
-import { API_BASE_URL } from '../apiConfig'; // Імпортуємо базовий URL API
+import { API_BASE_URL } from '../../apiConfig'; // Імпортуємо базовий URL API
 
 function AuthPage({ onLoginSuccess }) {
   const [isLoginMode, setIsLoginMode] = useState(true);

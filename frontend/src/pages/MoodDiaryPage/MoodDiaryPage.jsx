@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MoodDiaryPage.css';
-import { API_BASE_URL } from '../apiConfig';
+import { API_BASE_URL } from '../../apiConfig';
 
 const moodOptions = [
   { mood: 'terrible', emoji: '😞', label: 'Жахливо' },
@@ -10,7 +11,8 @@ const moodOptions = [
   { mood: 'great', emoji: '🤩', label: 'Чудово' },
 ];
 
-function MoodDiaryPage({ token, navigateToChat }) {
+function MoodDiaryPage({ token }) {
+  const navigate = useNavigate();
   const [selectedMood, setSelectedMood] = useState(null);
   const [notes, setNotes] = useState('');
   const [history, setHistory] = useState([]);
@@ -70,7 +72,7 @@ function MoodDiaryPage({ token, navigateToChat }) {
     <div className="mood-diary-container">
       <header className="mood-diary-header">
         <h1>Щоденник настрою</h1>
-        <button onClick={navigateToChat} className="nav-button-back">Назад до чату</button>
+        <button onClick={() => navigate('/chat')} className="nav-button-back">Назад до чату</button>
       </header>
       
       <div className="mood-entry-section">

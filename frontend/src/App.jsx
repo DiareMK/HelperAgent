@@ -1,15 +1,14 @@
-// src/App.js
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
-import AuthPage from './components/AuthPage';
-import ChatPage from './components/ChatPage';
-import MoodDiaryPage from './components/MoodDiaryPage';
-import './App.css'; // Загальні стилі для всього додатку
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AuthPage from './pages/AuthPage/AuthPage';
+import ChatPage from './pages/ChatPage/ChatPage';
+import MoodDiaryPage from './pages/MoodDiaryPage/MoodDiaryPage';
+import './App.css';
 
 function App() {
   const [token, setToken] = useState(null);
-  const [currentPage, setCurrentPage] = useState('chat'); // НОВЕ: для навігації
 
-  // При першому завантаженні, перевіряємо чи є токен в localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) {
@@ -20,7 +19,6 @@ function App() {
   const handleLoginSuccess = (newToken) => {
     localStorage.setItem('authToken', newToken);
     setToken(newToken);
-     setCurrentPage('chat'); // Після входу завжди відкриваємо чат
   };
 
   const handleLogout = () => {
@@ -28,23 +26,29 @@ function App() {
     setToken(null);
   };
 
-  // НОВЕ: функція для рендерингу поточної сторінки
-  const renderPage = () => {
-    if (currentPage === 'diary') {
-      return <MoodDiaryPage token={token} navigateToChat={() => setCurrentPage('chat')} />;
-    }
-    // За замовчуванням показуємо чат
-    return <ChatPage token={token} onLogout={handleLogout} navigateToDiary={() => setCurrentPage('diary')} />;
-  };
-
   return (
-    <div className="app-container">
-      {!token ? (
-        <AuthPage onLoginSuccess={handleLoginSuccess} />
-      ) : (
-        renderPage() // Викликаємо функцію рендерингу
-      )}
-    </div>
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route 
+            path="/auth" 
+            element={!token ? <AuthPage onLoginSuccess={handleLoginSuccess} /> : <Navigate to="/chat" />} 
+          />
+          <Route 
+            path="/chat" 
+            element={token ? <ChatPage token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} 
+          />
+          <Route 
+            path="/diary" 
+            element={token ? <MoodDiaryPage token={token} /> : <Navigate to="/auth" />} 
+          />
+          <Route 
+            path="/" 
+            element={<Navigate to={token ? "/chat" : "/auth"} />} 
+          />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

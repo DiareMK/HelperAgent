@@ -3,5 +3,5 @@ flask-cors
 flask-sqlalchemy
 flask-bcrypt
 flask-jwt-extended
-google-generativeai
+google-genai
 python-dotenv
