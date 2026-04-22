@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './SettingsView.css';
 
-const API_BASE_URL = 'http://localhost:5001';
+import { API_BASE_URL } from '../../apiConfig';
 
 function SettingsView({ isDarkMode, toggleTheme, fontSize, onChangeFontSize, onClearHistory, onLogout }) {
 
